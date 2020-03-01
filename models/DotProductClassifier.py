@@ -8,6 +8,7 @@ class DotProduct_Classifier(nn.Module):
         self.fc = nn.Linear(feat_dim, num_classes)
         
     def forward(self, x, *args):
+        print(f"shape before: {x.shape}")
         x = self.fc(x)
         return x, None
     

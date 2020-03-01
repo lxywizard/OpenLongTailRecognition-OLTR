@@ -134,7 +134,11 @@ class model ():
                     self.centroids = None
 
             # Calculate logits with classifier
-            self.logits, self.direct_memory_feature = self.networks['classifier'](self.features, self.centroids)
+            if self.centroids:
+                print(f'input self.centroids: {self.centroids.unsqueeze(0).shape}')
+                self.logits, self.direct_memory_feature = self.networks['classifier'](self.features, self.centroids.unsqueeze(0))
+            else:
+                self.logits, self.direct_memory_feature = self.networks['classifier'](self.features, self.centroids)
 
     def batch_backward(self):
         # Zero out optimizer gradients
@@ -149,6 +153,8 @@ class model ():
             self.criterion_optimizer.step()
 
     def batch_loss(self, labels):
+        print(f'shape of the labels {labels.shape}')
+        print(f'shape of the logits {self.logits.shape}')
 
         # First, apply performance loss
         self.loss_perf = self.criterions['PerformanceLoss'](self.logits, labels) \
@@ -338,6 +344,8 @@ class model ():
                                    self.training_opt['feature_dim']).cuda()
 
         print('Calculating centroids.')
+        print(f'centroids shape before {centroids.shape}')
+        print(f'data class count {torch.tensor(class_count(data)).float().unsqueeze(1).shape}')
 
         for model in self.networks.values():
             model.eval()
@@ -356,6 +364,7 @@ class model ():
 
         # Average summed features with class count
         centroids /= torch.tensor(class_count(data)).float().unsqueeze(1).cuda()
+        print(f'centroids shape after {centroids.shape}')
 
         return centroids
 

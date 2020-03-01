@@ -23,8 +23,14 @@ class MetaEmbedding_Classifier(nn.Module):
         feat_size = x.size(1)
         
         # set up visual memory
+        print(f'x shape: {x.shape}')
         x_expand = x.clone().unsqueeze(1).expand(-1, self.num_classes, -1)
+        print(f'x_expand shape: {x_expand.shape}')
+
+        centroids = centroids[0]
+        print(f'centorids shape: {centroids.shape}')
         centroids_expand = centroids.clone().unsqueeze(0).expand(batch_size, -1, -1)
+        print(f'centroids_expand shape: {centroids_expand.shape}')
         keys_memory = centroids.clone()
         
         # computing reachability
